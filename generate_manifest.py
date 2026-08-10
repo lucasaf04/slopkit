@@ -1,6 +1,8 @@
 import hashlib
 import json
 import os
+import shutil
+import sys
 
 ALLOWED_TARGETS = (
     "document/",
@@ -53,10 +55,40 @@ def build_manifest():
         json.dump(manifest_data, f, indent=2)
 
     print(
-        f"Generated {manifest_path} with {len(file_hashes)} files (version: {manifest_version})"
+        f"Generated {manifest_path} with {len(sorted_file_hashes)} files (version: {manifest_version})"
     )
     return manifest_data
 
 
+def stage_for_deploy(stage_dir):
+    project_root = os.path.dirname(os.path.abspath(__file__))
+    manifest_data = build_manifest()
+
+    stage_path = os.path.abspath(os.path.join(project_root, stage_dir))
+    if os.path.exists(stage_path):
+        shutil.rmtree(stage_path)
+    os.makedirs(stage_path, exist_ok=True)
+
+    for relpath in manifest_data["files"]:
+        src = os.path.join(project_root, relpath)
+        dst = os.path.join(stage_path, relpath)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy2(src, dst)
+
+    shutil.copy2(
+        os.path.join(project_root, "cache-manifest.json"),
+        os.path.join(stage_path, "cache-manifest.json"),
+    )
+
+    print(
+        f"Staged {len(manifest_data['files']) + 1} files into '{stage_dir}' for deployment"
+    )
+
+
 if __name__ == "__main__":
-    build_manifest()
+    if len(sys.argv) > 2 and sys.argv[1] == "--stage":
+        stage_for_deploy(sys.argv[2])
+    elif len(sys.argv) > 1 and sys.argv[1] == "--stage":
+        stage_for_deploy("_site")
+    else:
+        build_manifest()
