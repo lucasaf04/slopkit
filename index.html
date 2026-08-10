@@ -91,5 +91,14 @@ try {
 } catch (e) {}
 </script>
 
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(function(reg) {
+        console.log('Offline cache ServiceWorker registered:', reg.scope);
+    }).catch(function(err) {
+        console.warn('ServiceWorker registration failed:', err);
+    });
+}
+</script>
 </body>
 </html>
