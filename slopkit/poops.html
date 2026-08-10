@@ -198,11 +198,7 @@
 <pre id="scr"></pre>
 <div id="payloadMenu">
   <img class="menuTitle" data-src="../ui/payload-menu-title.png" alt="">
-  <a class="payloadTile" href="#" data-name="ftpsrv-ps5.elf" data-key="ftp"><img data-src="../ui/payload-ftp-default.png" alt=""></a>
-  <a class="payloadTile" href="#" data-name="gdbsrv-ps5.elf" data-key="gdb"><img data-src="../ui/payload-gdb-default.png" alt=""></a>
-  <a class="payloadTile" href="#" data-name="klogsrv-ps5.elf" data-key="klog"><img data-src="../ui/payload-klog-default.png" alt=""></a>
-  <a class="payloadTile" href="#" data-name="shsrv-ps5.elf" data-key="shell"><img data-src="../ui/payload-shell-default.png" alt=""></a>
-  <a class="payloadTile" href="#" data-name="websrv-ps5.elf" data-key="web"><img data-src="../ui/payload-web-default.png" alt=""></a>
+  <a class="payloadTile" href="#" data-name="pldmgr_v0.5.1.elf" data-key="pldmgr"><img data-src="../ui/payload-pldmgr-default.png" alt=""></a>
 </div>
 <div id="nav"></div>
 <div id="arm" hidden>Open this page with <b>?go=1</b> to arm it. Nothing runs
@@ -1789,6 +1785,15 @@ function lastRunText() {
         lockNav(false);
     });
 })();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../sw.js').then(function(reg) {
+        console.log('Offline cache ServiceWorker registered:', reg.scope);
+    }).catch(function(err) {
+        console.warn('ServiceWorker registration failed:', err);
+    });
+}
 </script>
 </body>
 </html>
