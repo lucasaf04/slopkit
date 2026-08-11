@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" manifest="cache.appcache">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -60,9 +60,33 @@
     pointer-events: none;
   }
   #status { min-height: 1.5em; color: #9fb1c3; font-size: 18px; }
+
+  #cache-area {
+    width: 260px; display: flex; flex-direction: column;
+    align-items: center; gap: 8px;
+  }
+  #cache-bar-track {
+    width: 100%; height: 6px; border-radius: 3px;
+    background: rgba(255,255,255,.08);
+    overflow: hidden; display: none;
+  }
+  #cache-bar-fill {
+    width: 0%; height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, #3b8cff, #60a5fa);
+    transition: width .15s ease;
+  }
+  #cache-status {
+    font-size: 13px; color: #7a8ea0;
+    text-align: center; min-height: 1.3em;
+  }
+  #cache-status a {
+    color: #60a5fa; text-decoration: underline; cursor: pointer;
+  }
+
   @media (max-width: 650px) {
     #actions { width: 82vw; }
     .action { width: 100%; }
+    #cache-area { width: 82vw; }
   }
 </style>
 </head>
@@ -74,6 +98,10 @@
     <a id="start" class="action"
        href="slopkit/poops.html?go=1&amp;auto=1&amp;trigger=netcontrol&amp;payload=1&amp;v=17"
        tabindex="0">RUN</a>
+  </div>
+  <div id="cache-area">
+    <div id="cache-bar-track"><div id="cache-bar-fill"></div></div>
+    <div id="cache-status"></div>
   </div>
   <div id="status"></div>
 </div>
@@ -89,6 +117,64 @@ try {
         this.style.display = "none";
     });
 } catch (e) {}
+
+// --- AppCache ---
+(function () {
+    if (!window.applicationCache) return;
+    var track = document.getElementById("cache-bar-track");
+    var fill = document.getElementById("cache-bar-fill");
+    var cs = document.getElementById("cache-status");
+    var ac = window.applicationCache;
+
+    if (ac.status === 1) { // IDLE — already cached
+        cs.textContent = "✓ cache downloaded";
+        cs.style.color = "#5bdb7e";
+        return;
+    }
+
+    var loaded = 0, total = 0;
+
+    ac.addEventListener("downloading", function () {
+        track.style.display = "block";
+        cs.textContent = "caching…";
+        cs.style.color = "#7a8ea0";
+    });
+
+    ac.addEventListener("progress", function (e) {
+        loaded++;
+        if (e.total) total = e.total;
+        track.style.display = "block";
+        if (total > 0) {
+            fill.style.width = Math.round((loaded / total) * 100) + "%";
+            cs.textContent = "caching… " + loaded + " / " + total;
+        } else {
+            cs.textContent = "caching… " + loaded + " files";
+        }
+        cs.style.color = "#7a8ea0";
+    });
+
+    ac.addEventListener("cached", function () {
+        track.style.display = "none";
+        cs.innerHTML = '✓ cache ready — <a onclick="location.reload()">reload page</a>';
+        cs.style.color = "#5bdb7e";
+    });
+
+    ac.addEventListener("updateready", function () {
+        track.style.display = "none";
+        cs.innerHTML = '✓ update ready — <a onclick="location.reload()">reload page</a>';
+        cs.style.color = "#5bdb7e";
+    });
+
+    ac.addEventListener("noupdate", function () {
+        cs.textContent = "✓ cache downloaded";
+        cs.style.color = "#5bdb7e";
+    });
+
+    ac.addEventListener("error", function () {
+        cs.textContent = "cache error";
+        cs.style.color = "#e05555";
+    });
+})();
 </script>
 
 </body>

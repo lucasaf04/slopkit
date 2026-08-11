@@ -198,11 +198,7 @@
 <pre id="scr"></pre>
 <div id="payloadMenu">
   <img class="menuTitle" data-src="../ui/payload-menu-title.png" alt="">
-  <a class="payloadTile" href="#" data-name="ftpsrv-ps5.elf" data-key="ftp"><img data-src="../ui/payload-ftp-default.png" alt=""></a>
-  <a class="payloadTile" href="#" data-name="gdbsrv-ps5.elf" data-key="gdb"><img data-src="../ui/payload-gdb-default.png" alt=""></a>
-  <a class="payloadTile" href="#" data-name="klogsrv-ps5.elf" data-key="klog"><img data-src="../ui/payload-klog-default.png" alt=""></a>
-  <a class="payloadTile" href="#" data-name="shsrv-ps5.elf" data-key="shell"><img data-src="../ui/payload-shell-default.png" alt=""></a>
-  <a class="payloadTile" href="#" data-name="websrv-ps5.elf" data-key="web"><img data-src="../ui/payload-web-default.png" alt=""></a>
+  <a class="payloadTile" href="#" data-name="pldmgr_v0.5.1.elf" data-key="pldmgr"><img data-src="../ui/payload-pldmgr-default.png" alt=""></a>
 </div>
 <div id="nav"></div>
 <div id="arm" hidden>Open this page with <b>?go=1</b> to arm it. Nothing runs
@@ -469,7 +465,7 @@ const rowByKey = new Map();
 let payloadSendBusy = false;
 const PAYLOAD_PORT = 9021;
 const PAYLOAD_BUFFER_SIZE = 0x10000;
-const PAYLOAD_MAX_SIZE = 0x200000;
+const PAYLOAD_MAX_SIZE = 0x300000;
 let payloadSendStore = null;
 let payloadSockaddrStore = null;
 let payloadSocketOptionStore = null;
@@ -563,7 +559,7 @@ async function sendPayloadToElfldr(name) {
     if (!bytes.length)
         throw new Error("payload is empty");
     if (bytes.length > PAYLOAD_MAX_SIZE)
-        throw new Error("payload is larger than the 2 MiB limit");
+        throw new Error("payload is larger than the 3 MiB limit");
     if (bytes.length < 4 || bytes[0] !== 0x7f || bytes[1] !== 0x45
         || bytes[2] !== 0x4c || bytes[3] !== 0x46)
         throw new Error("payload does not start with the ELF signature");
